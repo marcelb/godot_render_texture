@@ -1,0 +1,159 @@
+[gd_scene load_steps=19 format=3 uid="uid://dc66x6h30fndh"]
+
+[ext_resource type="Texture2D" uid="uid://l5qwdkmx6a7c" path="res://texture/wood.webp" id="1_ty8vs"]
+[ext_resource type="Shader" path="res://screen_reading_shader1.gdshader" id="2_jf5x2"]
+[ext_resource type="Shader" path="res://screen_reading_shader2.gdshader" id="3_mydwm"]
+
+[sub_resource type="GDScript" id="GDScript_kwoxf"]
+script/source = "extends Node3D
+
+@export
+var test:String
+
+# Called when the node enters the scene tree for the first time.
+func _ready() -> void:
+	pass # Replace with function body.
+
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+func _process(delta: float) -> void:
+	pass
+"
+
+[sub_resource type="Environment" id="Environment_6inj5"]
+background_mode = 1
+background_color = Color(0.942823, 0.942823, 0.942823, 1)
+ambient_light_source = 2
+ambient_light_color = Color(1, 1, 1, 1)
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_k7d28"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_apbd1"]
+albedo_texture = ExtResource("1_ty8vs")
+
+[sub_resource type="GDScript" id="GDScript_cc6ib"]
+script/source = "@tool
+extends MeshInstance3D
+
+
+func _process(delta: float) -> void:
+	rotate(Vector3(0.0, 1.0, 0.0), 1.0 * delta);
+	pass
+"
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_rphbp"]
+size = Vector2(100, 100)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_xlx3y"]
+render_priority = 1
+albedo_color = Color(0.196078, 0.360784, 0.427451, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_08jd8"]
+size = Vector3(2, 2, 0.1)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_n5c1v"]
+render_priority = 0
+shader = ExtResource("2_jf5x2")
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_72ine"]
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_qil0d"]
+seamless = true
+as_normal_map = true
+noise = SubResource("FastNoiseLite_72ine")
+
+[sub_resource type="ViewportTexture" id="ViewportTexture_ymxvk"]
+viewport_path = NodePath("SubViewport")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_7t0sq"]
+resource_local_to_scene = true
+render_priority = 0
+shader = ExtResource("3_mydwm")
+shader_parameter/noise = SubResource("NoiseTexture2D_qil0d")
+shader_parameter/screen_tex = SubResource("ViewportTexture_ymxvk")
+
+[sub_resource type="GDScript" id="GDScript_uclt0"]
+script/source = "@tool
+extends SubViewport
+
+@export var resolution = 10
+
+func _ready() -> void:
+	if Engine.is_editor_hint():
+		size = EditorInterface.get_editor_viewport_3d(0).size / resolution
+	else:
+		size = get_tree().root.size
+
+func _process(delta: float) -> void:
+	if Engine.is_editor_hint():
+		size = EditorInterface.get_editor_viewport_3d(0).size / resolution
+	else:
+		size = get_tree().root.size
+"
+
+[sub_resource type="GDScript" id="GDScript_1mwor"]
+script/source = "@tool
+extends Camera3D
+
+@export
+var resolution = 10
+
+func _ready() -> void:
+	if Engine.is_editor_hint():
+		transform = EditorInterface.get_editor_viewport_3d(0).get_camera_3d().transform
+
+func _process(delta: float) -> void:
+	if Engine.is_editor_hint():
+		transform = EditorInterface.get_editor_viewport_3d(0).get_camera_3d().transform
+"
+
+[node name="RenderTextureWorld" type="Node3D"]
+script = SubResource("GDScript_kwoxf")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_6inj5")
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.705827, 1.05996, 4.56403)
+current = true
+
+[node name="RemoteTransform3D" type="RemoteTransform3D" parent="Camera3D"]
+remote_path = NodePath("../../SubViewport/Camera3D")
+
+[node name="someobject" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.437541, 0, 0.896049, 0, 1, 0, -0.896049, 0, 0.437541, 0, 0.992885, 0)
+mesh = SubResource("CapsuleMesh_k7d28")
+surface_material_override/0 = SubResource("StandardMaterial3D_apbd1")
+script = SubResource("GDScript_cc6ib")
+
+[node name="floor" type="MeshInstance3D" parent="."]
+layers = 3
+mesh = SubResource("PlaneMesh_rphbp")
+surface_material_override/0 = SubResource("StandardMaterial3D_xlx3y")
+
+[node name="lenses" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1.58042)
+
+[node name="screen_reading_1" type="MeshInstance3D" parent="lenses"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.154275, 1.0798, 0.0235972)
+mesh = SubResource("BoxMesh_08jd8")
+surface_material_override/0 = SubResource("ShaderMaterial_n5c1v")
+
+[node name="screen_reading_2" type="MeshInstance3D" parent="lenses"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.629097, 1.0798, 1.0236)
+layers = 2
+cast_shadow = 0
+mesh = SubResource("BoxMesh_08jd8")
+surface_material_override/0 = SubResource("ShaderMaterial_7t0sq")
+
+[node name="SubViewport" type="SubViewport" parent="."]
+size = Vector2i(956, 424)
+script = SubResource("GDScript_uclt0")
+resolution = 2
+
+[node name="Camera3D" type="Camera3D" parent="SubViewport"]
+transform = Transform3D(0.991899, -0.0391445, 0.120847, 0, 0.951337, 0.308154, -0.127029, -0.305658, 0.94363, -0.724551, 2.58304, 7.18243)
+visible = false
+cull_mask = 1048573
+script = SubResource("GDScript_1mwor")
+resolution = null
