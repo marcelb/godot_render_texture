@@ -123,7 +123,7 @@ current = true
 remote_path = NodePath("../../SubViewport/Camera3D")
 
 [node name="someobject" type="MeshInstance3D" parent="."]
-transform = Transform3D(0.240687, 0, -0.966303, 0, 1, 0, 0.966303, 0, 0.240687, 0, 0.992885, 0)
+transform = Transform3D(-0.332746, 0, 0.938556, 0, 1, 0, -0.938556, 0, -0.332746, 0, 0.992885, 0)
 mesh = SubResource("CapsuleMesh_k7d28")
 surface_material_override/0 = SubResource("StandardMaterial3D_apbd1")
 script = SubResource("GDScript_cc6ib")
@@ -153,7 +153,7 @@ size = Vector2i(761, 341)
 script = SubResource("GDScript_uclt0")
 
 [node name="Camera3D" type="Camera3D" parent="SubViewport"]
-transform = Transform3D(0.996083, -0.00943928, 0.0879187, 0, 0.994286, 0.10675, -0.088424, -0.106332, 0.990391, -0.07209, 1.40923, 4.32901)
+transform = Transform3D(0.996083, -0.00943928, 0.0879187, 0, 0.994286, 0.10675, -0.088424, -0.106332, 0.990391, -0.0720902, 1.40923, 4.32901)
 visible = false
 cull_mask = 1048573
 script = SubResource("GDScript_1mwor")
